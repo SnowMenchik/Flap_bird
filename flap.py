@@ -1,5 +1,5 @@
-import pygame, sys, random # type: ignore
-from pygame.locals import QUIT, K_SPACE # type: ignore
+import pygame, sys, random
+from pygame.locals import QUIT, K_SPACE
 
 pygame.init()
 
@@ -7,12 +7,13 @@ class constant:
     screen_w = 400
     screen_h = 600
     bg_color = (135, 206, 235)
-    gravity = 0.3
-    jump_force = -5
+    gravity = 0.25
+    jump_force = -6.5
     fps = 60
     ground_h = 50
     pipe_w = 70
-    pipe_gap = 150
+    pipe_gap = 200
+    pipe_speed = 2.5
 
 screen = pygame.display.set_mode((constant.screen_w, constant.screen_h))
 pygame.display.set_caption('Flapy bird')
@@ -24,10 +25,10 @@ class bird:
     def __init__(self):
         self.x = 100
         self.y = constant.screen_h // 2
-        self.wb = 40
+        self.wb = 30
         self.hb = 30
         self.v = 0
-        self.rect = pygame.Rect(self.x, self.y, self.wb, self.hb)
+        self.rect = pygame.Rect(self.x + 8, self.y + 6, self.wb - 16, self.hb - 12)
 
         self.image = pygame.image.load('bird.png')
         self.image = pygame.transform.scale(self.image, (self.wb, self.hb))
@@ -35,7 +36,8 @@ class bird:
     def update(self):
         self.v += constant.gravity
         self.y += self.v
-        self.rect.y = self.y
+
+        self.rect.y = self.y + 6
 
         if self.y < 0:
             self.y = 0
@@ -59,17 +61,16 @@ class pipe:
         self.passed = False
 
         min_top_h = 80
-        min_bottom_h =100
+        min_bottom_h = 100
         max_top_h = constant.screen_h - constant.ground_h - self.gap - min_bottom_h
 
-        self.top_h = random.randint(min_top_h,max_top_h)
+        self.top_h = random.randint(min_top_h, max_top_h)
 
-        self.top_rect = pygame.Rect(self.x, 0, self.w, self.top_h)
-
+        self.top_rect = pygame.Rect(self.x + 15, 0, self.w - 30, self.top_h)
         self.bottom_rect = pygame.Rect(
-            self.x,
+            self.x + 15,
             self.top_h + self.gap,
-            self.w,
+            self.w - 30,
             constant.screen_h - self.top_h - self.gap - constant.ground_h
         )
 
@@ -78,29 +79,28 @@ class pipe:
         self.top_pipe_image = pygame.transform.flip(self.pipe_image, False, True)
 
     def update(self):
-        self.x -= 3
-        self.top_rect.x = self.x
-        self.bottom_rect.x = self.x
+        self.x -= constant.pipe_speed
+        self.top_rect.x = self.x + 15
+        self.bottom_rect.x = self.x + 15
 
     def off_screen(self):
         return self.x + self.w < 0
     
     def draw(self, surface):
-        surface.blit(self.top_pipe_image, (self.x, 0))
+        surface.blit(self.top_pipe_image, (self.x, 0), (0, constant.screen_h - self.top_h, self.w, self.top_h))
 
         bottom_pipe_y = self.top_h + self.gap
-        bottom_pipe_h = constant.screen_h - bottom_pipe_y - constant.ground_h
-        bottom_h = constant.screen_h - self.top_h -self.gap - constant.ground_h
-        surface.blit(self.pipe_image, (self.x, bottom_pipe_y), (0, 0, self.w, bottom_pipe_h))
+        bottom_pipe_height = constant.screen_h - self.top_h - self.gap - constant.ground_h
+        surface.blit(self.pipe_image, (self.x, bottom_pipe_y), (0, 0, self.w, bottom_pipe_height))
 
-class game:
+class game: 
     def __init__(self):
         self.bird = bird()
         self.pipes = []
         self.score = 0
         self.game_over = False
         self.pipe_timer = 0
-        self.pipe_interval = 1800
+        self.pipe_interval = 2000
 
         self.spawn_pipe()
 
@@ -120,7 +120,7 @@ class game:
         for pipe in self.pipes[:]:
             pipe.update()
 
-            if (self.bird.rect.colliderect(pipe.top_rect) or self.bird.rect.colliderect(pipe.bottom_rect)):
+            if self.bird.rect.colliderect(pipe.top_rect) or self.bird.rect.colliderect(pipe.bottom_rect):
                 self.game_over = True
                 
             if not pipe.passed and pipe.x + pipe.w < self.bird.x:
@@ -154,7 +154,8 @@ class game:
 
         if self.game_over:
             game_over_text = font.render('Нажмите пробел для возрождения', True, (255, 0, 0))
-            surface.blit(game_over_text, (constant.screen_w // 2 - 150, constant.screen_h // 2))
+            text_rect = game_over_text.get_rect(center=(constant.screen_w//2, constant.screen_h//2))
+            surface.blit(game_over_text, text_rect)
     
     def restart(self):
         self.__init__()
@@ -175,8 +176,6 @@ while True:
                     games.bird.jump()
 
     games.update()
-
     games.draw(screen)
-
     pygame.display.update()
     clock.tick(constant.fps)
