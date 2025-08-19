@@ -4,7 +4,7 @@ from pygame.locals import QUIT, K_SPACE
 pygame.init()
 
 class constant:
-    screen_w = 400
+    screen_w = 500
     screen_h = 600
     bg_color = (135, 206, 235)
     gravity = 0.25
