@@ -7,28 +7,28 @@ class constant:
     screen_w = 500
     screen_h = 600
     bg_color = (135, 206, 235)
-    gravity = 0.25
-    jump_force = -6.5
+    gravity = 0.35
+    jump_force = -5.5
     fps = 60
     ground_h = 50
-    pipe_w = 70
-    pipe_gap = 200
-    pipe_speed = 2.5
+    pipe_w = 100
+    pipe_gap = 100
+    pipe_speed = 4
 
 screen = pygame.display.set_mode((constant.screen_w, constant.screen_h))
-pygame.display.set_caption('Flapy bird')
+pygame.display.set_caption('Flap bird')
 clock = pygame.time.Clock()
 
-font = pygame.font.SysFont(None, 36)
+font = pygame.font.SysFont(None, 40)
 
 class bird:
     def __init__(self):
-        self.x = 100
-        self.y = constant.screen_h // 2
-        self.wb = 30
-        self.hb = 30
+        self.x = 150
+        self.y = constant.screen_h // 2 - 50
+        self.wb = 35
+        self.hb = 35
         self.v = 0
-        self.rect = pygame.Rect(self.x + 8, self.y + 6, self.wb - 16, self.hb - 12)
+        self.rect = pygame.Rect(self.x + 8, self.y + 6, self.wb - 25, self.hb - 30)
 
         self.image = pygame.image.load('bird.png')
         self.image = pygame.transform.scale(self.image, (self.wb, self.hb))
