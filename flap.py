@@ -8,12 +8,11 @@ class constant:
     screen_h = 600
     bg_color = (135, 206, 235)
     gravity = 0.35
-    jump_force = -5.5
     fps = 60
     ground_h = 50
     pipe_w = 100
-    pipe_gap = 100
-    pipe_speed = 4
+    pipe_gap = 80
+    pipe_speed = 6
 
 screen = pygame.display.set_mode((constant.screen_w, constant.screen_h))
 pygame.display.set_caption('Flap bird')
@@ -25,14 +24,15 @@ class bird:
     def __init__(self):
         self.x = 150
         self.y = constant.screen_h // 2 - 50
-        self.wb = 35
         self.hb = 35
         self.v = 0
-        self.rect = pygame.Rect(self.x + 8, self.y + 6, self.wb - 25, self.hb - 30)
+        #10 - КОЛИЗИЯ ДЛИНЫ
+        self.rect = pygame.Rect(self.x + 8, self.y + 6, 10, self.hb - 30)
 
         self.image = pygame.image.load('bird.png')
-        self.image = pygame.transform.scale(self.image, (self.wb, self.hb))
-    
+        #35 - ДЛИНА
+        self.image = pygame.transform.scale(self.image, (35, self.hb))
+     
     def update(self):
         self.v += constant.gravity
         self.y += self.v
@@ -48,7 +48,8 @@ class bird:
             self.v = 0
 
     def jump(self):
-        self.v = constant.jump_force
+        #СИЛА ПРЫЖКА
+        self.v = -5.5
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
